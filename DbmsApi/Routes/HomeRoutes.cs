@@ -1,5 +1,6 @@
 using DbmsApi.DTO;
 using DbmsApi.Services;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace DbmsApi.Routes
 {
@@ -10,12 +11,17 @@ namespace DbmsApi.Routes
       app.MapGet("/", GetDatabases);
     }
 
-    private static IResult GetDatabases(IConnectionManager connectionManager)
+    private static JsonHttpResult<List<DbDto>> GetDatabases(IConnectionManager connectionManager)
     {
       var files = Directory.GetFiles(Path.Combine(Directory.GetCurrentDirectory(), @"..\..\dbs"), "*.db")
-                  .Select(f => new DbDto { Name = Path.GetFileName(f) })
-                  .ToList();
-      return TypedResults.Ok(files);
+          .Select(f =>
+          {
+            string id = connectionManager.CreateConnection(f);
+            return new DbDto { Id = id, Name = Path.GetFileName(f) };
+          })
+          .ToList();
+
+      return TypedResults.Json(files);
     }
   }
 }

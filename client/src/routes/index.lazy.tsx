@@ -1,13 +1,61 @@
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { api, queryKeyFactory } from "@/api";
+import { Button } from "@/components/ui/button";
+import {
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+  Table,
+} from "@/components/ui/table";
+import { useQuery } from "@tanstack/react-query";
+import { createLazyFileRoute, Link } from "@tanstack/react-router";
+import { Loader2 } from "lucide-react";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
 
 function Index() {
+  const { data: databases, isLoading } = useQuery({
+    queryFn: () => api.root.getDatabases(),
+    queryKey: queryKeyFactory.root.all,
+  });
+
   return (
-    <div className="p-2">
-      <h3>Welcome Home!</h3>
+    <div className="container">
+      <h1 className="scroll-m-20 py-8 text-4xl font-extrabold tracking-tight lg:text-5xl">
+        Available Databases
+      </h1>
+      {isLoading ? (
+        <Loader2 className="animate-spin" />
+      ) : (
+        <>
+          <Table>
+            <TableHeader>
+              <TableRow className="hover:bg-background">
+                <TableHead>Name</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {databases?.data.map((db) => (
+                <TableRow key={db.id} className="hover:bg-background">
+                  <TableCell className="font-medium">{db.name}</TableCell>
+                  <TableCell className="flex justify-end gap-2 text-right">
+                    <Button asChild size={"sm"}>
+                      <Link to={`/`}>Connect</Link>
+                    </Button>
+                    <Button size={"sm"} variant={"destructive"}>
+                      Delete
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </>
+      )}
     </div>
   );
 }

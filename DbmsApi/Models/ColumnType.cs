@@ -86,19 +86,19 @@
 		}
 	}
 
-	public sealed class ComlexIntType : IColumnType
+	public sealed class ComplexIntType : IColumnType
 	{
-		private static ComlexIntType? _instance = null;
+		private static ComplexIntType? _instance = null;
 
-		private ComlexIntType() { }
+		private ComplexIntType() { }
 
-		public static ComlexIntType GetInstance()
+		public static ComplexIntType GetInstance()
 		{
-			_instance ??= new ComlexIntType();
+			_instance ??= new ComplexIntType();
 			return _instance;
 		}
 
-		public string Name => "CompexInt";
+		public string Name => "ComplexInt";
 
 		public ColumnValue Instance(object? value, bool isNullable)
 		{
@@ -106,19 +106,19 @@
 		}
 	}
 
-	public sealed class ComlexRealType : IColumnType
+	public sealed class ComplexRealType : IColumnType
 	{
-		private static ComlexRealType? _instance = null;
+		private static ComplexRealType? _instance = null;
 
-		private ComlexRealType() { }
+		private ComplexRealType() { }
 
-		public static ComlexRealType GetInstance()
+		public static ComplexRealType GetInstance()
 		{
-			_instance ??= new ComlexRealType();
+			_instance ??= new ComplexRealType();
 			return _instance;
 		}
 
-		public string Name => "CompexReal";
+		public string Name => "ComplexReal";
 
 		public ColumnValue Instance(object? value, bool isNullable)
 		{
@@ -133,8 +133,8 @@
 			{ "REAL", RealType.GetInstance },
 			{ "TEXT", TextType.GetInstance },
 			{ "CHAR", CharType.GetInstance },
-			{ "COMPLEXINT", ComlexIntType.GetInstance },
-			{ "COMPLEXREAL", ComlexRealType.GetInstance },
+			{ "COMPLEXINT", ComplexIntType.GetInstance },
+			{ "COMPLEXREAL", ComplexRealType.GetInstance },
 		};
 
 		public static List<string> AvailableTypes = ["Int", "Real", "Text", "Char", "ComplexInt", "ComplexReal"];
