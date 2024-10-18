@@ -9,6 +9,7 @@ namespace DbmsApi.Routes
     public static void RegisterHomeRoutes(this WebApplication app)
     {
       app.MapGet("/", GetDatabases);
+      app.MapPost("/", CreateDatabase);
     }
 
     private static JsonHttpResult<List<DbDto>> GetDatabases(IConnectionManager connectionManager)
@@ -22,6 +23,18 @@ namespace DbmsApi.Routes
           .ToList();
 
       return TypedResults.Json(files);
+    }
+
+    private static IResult CreateDatabase(CreateDatabaseDto request, IConnectionManager connectionManager)
+    {
+      string fullPath = Path.Combine(Directory.GetCurrentDirectory(), @"..\..\dbs", request.Name);
+      if (!fullPath.EndsWith(".db")) fullPath += ".db";
+
+      if (Path.Exists(fullPath))
+        return TypedResults.Json(new { message = "Database with this name already exists!" }, statusCode: 400);
+
+      string id = connectionManager.CreateConnection(fullPath);
+      return TypedResults.Json(new { id });
     }
   }
 }

@@ -1,4 +1,5 @@
 import { api, queryKeyFactory } from "@/api";
+import { CreateDatabaseDialog } from "@/components/dialogs/create-database-dialog";
 import { Button } from "@/components/ui/button";
 import {
   TableHeader,
@@ -24,9 +25,14 @@ function Index() {
 
   return (
     <div className="container">
-      <h1 className="scroll-m-20 py-8 text-4xl font-extrabold tracking-tight lg:text-5xl">
-        Available Databases
-      </h1>
+      <div className="flex items-center justify-between gap-4 py-8">
+        <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+          Available Databases
+        </h1>
+        <CreateDatabaseDialog>
+          <Button className="self-end">Create database</Button>
+        </CreateDatabaseDialog>
+      </div>
       {isLoading ? (
         <Loader2 className="animate-spin" />
       ) : (
@@ -39,7 +45,7 @@ function Index() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {databases?.data.map((db) => (
+              {databases?.map((db) => (
                 <TableRow key={db.id} className="hover:bg-background">
                   <TableCell className="font-medium">{db.name}</TableCell>
                   <TableCell className="flex justify-end gap-2 text-right">

@@ -7,6 +7,7 @@ import "./index.css";
 import { routeTree } from "./routeTree.gen";
 import { ThemeProvider } from "./components/theme-provider";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AxiosError } from "axios";
 
 // Create a new router instance
 const router = createRouter({ routeTree });
@@ -15,6 +16,12 @@ const router = createRouter({ routeTree });
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
+  }
+}
+
+declare module "@tanstack/react-query" {
+  interface Register {
+    defaultError: AxiosError;
   }
 }
 

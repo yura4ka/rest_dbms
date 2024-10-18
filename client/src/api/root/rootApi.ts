@@ -1,6 +1,8 @@
 import { apiClient } from "../apiClient";
-import { DbDto } from "./types";
+import { CreateDatabaseDto, CreateDatabaseError, CreateDatabaseResponse, DbDto } from "./types";
 
 export const rootApi = {
-  getDatabases: () => apiClient.get<DbDto[]>("/"),
+  getDatabases: () => apiClient.get<DbDto[]>("/").then((res) => res.data),
+  createDatabase: (request: CreateDatabaseDto) =>
+    apiClient.post<CreateDatabaseError, CreateDatabaseResponse>("/", request),
 };

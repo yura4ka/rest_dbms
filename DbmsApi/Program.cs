@@ -6,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddCors(options =>
 {
-  options.AddPolicy(name: MyAllowSpecificOrigins, policy => { policy.WithOrigins("http://localhost:5173"); });
+  options.AddPolicy(name: MyAllowSpecificOrigins, policy =>
+  {
+    policy.WithOrigins("http://localhost:5173").AllowAnyHeader().AllowAnyMethod();
+  });
 });
 
 builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
