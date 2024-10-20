@@ -1,5 +1,6 @@
 import { ModeToggle } from "@/components/mode-toggle";
 import { createRootRoute, Link, Outlet } from "@tanstack/react-router";
+import { Toaster } from "@/components/ui/sonner";
 
 export const Route = createRootRoute({
   component: () => (
@@ -25,6 +26,7 @@ export const Route = createRootRoute({
       <main>
         <Outlet />
       </main>
+      <Toaster />
     </div>
   ),
 });

@@ -1,5 +1,6 @@
 import { api, queryKeyFactory } from "@/api";
 import { CreateDatabaseDialog } from "@/components/dialogs/create-database-dialog";
+import { DeleteDatabaseDialog } from "@/components/dialogs/delete-database-dialog";
 import { Button } from "@/components/ui/button";
 import {
   TableHeader,
@@ -12,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute, Link } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
+import { useState } from "react";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -22,6 +24,8 @@ function Index() {
     queryFn: () => api.root.getDatabases(),
     queryKey: queryKeyFactory.root.all,
   });
+
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   return (
     <div className="container">
@@ -52,7 +56,7 @@ function Index() {
                     <Button asChild size={"sm"}>
                       <Link to={`/`}>Connect</Link>
                     </Button>
-                    <Button size={"sm"} variant={"destructive"}>
+                    <Button onClick={() => setDeleteId(db.id)} size={"sm"} variant={"destructive"}>
                       Delete
                     </Button>
                   </TableCell>
@@ -62,6 +66,12 @@ function Index() {
           </Table>
         </>
       )}
+      <DeleteDatabaseDialog
+        key={deleteId}
+        id={deleteId}
+        isVisible={!!deleteId}
+        onVisibleChange={() => setDeleteId(null)}
+      />
     </div>
   );
 }

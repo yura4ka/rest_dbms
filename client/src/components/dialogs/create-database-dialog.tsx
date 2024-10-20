@@ -7,7 +7,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
-import { Button } from "../ui/button";
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { useState } from "react";
@@ -15,9 +14,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api, queryKeyFactory } from "@/api";
 import { useNavigate } from "@tanstack/react-router";
 import { CreateDatabaseError } from "@/api/root/types";
-import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
 import axios from "axios";
+import { SubmitButton } from "../submit-button";
 
 type Props = {
   children: React.ReactNode;
@@ -81,21 +79,9 @@ export function CreateDatabaseDialog({ children }: Props) {
             </div>
           </div>
           <DialogFooter>
-            <Button
-              disabled={isDisabled || createDatabase.isPending}
-              type="submit"
-              className="relative"
-            >
-              <Loader2
-                className={cn(
-                  "absolute left-0 animate-spin opacity-0 transition-all",
-                  createDatabase.isPending && "left-4 opacity-100",
-                )}
-              />
-              <span className={cn("ml-0 transition-all", createDatabase.isPending && "ml-6")}>
-                Create
-              </span>
-            </Button>
+            <SubmitButton isLoading={createDatabase.isPending} disabled={isDisabled}>
+              Create
+            </SubmitButton>
           </DialogFooter>
         </form>
       </DialogContent>

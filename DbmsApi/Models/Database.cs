@@ -114,6 +114,7 @@ namespace DbmsApi.Models
 
 		public void Dispose()
 		{
+			_connection.Close();
 			_connection.Dispose();
 		}
 	}
