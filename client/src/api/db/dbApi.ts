@@ -5,4 +5,6 @@ export const dbApi = {
   getInfo: (id: string) => apiClient.get<DbInfoDto>(`db/${id}`).then((res) => res.data),
   getTable: (id: string, tableName: string, search?: string) =>
     apiClient.get<DbTable>(`db/${id}/${tableName}`, { params: { search } }).then((res) => res.data),
+  deleteRow: (id: string, tableName: string, pkValue: string) =>
+    apiClient.delete(`db/${id}/${tableName}`, { params: { pkValue } }),
 };

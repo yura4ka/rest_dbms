@@ -4,11 +4,11 @@ import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { Table, TableHeader, TableRow, TableBody, TableCell, TableHead } from "./ui/table";
 import { generateTableName, getPkIndex } from "@/lib/dbUtils";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
-import { SubmitButton } from "./submit-button";
+import { DeleteRowData, DeleteRowDialog } from "./dialogs/delete-row-dialog";
 
 type Props = {
   tableName: string;
@@ -24,6 +24,8 @@ export function TableView({ tableName, onNotFoundError }: Props) {
     queryKey: queryKeyFactory.db.tableById(dbId, tableName, search),
     queryFn: () => api.db.getTable(dbId, tableName, search),
   });
+
+  const [deleteRowData, setDeleteRowData] = useState<DeleteRowData | null>(null);
 
   const pkIndex = useMemo(() => getPkIndex(data?.columns ?? []), [data?.columns]);
 
@@ -56,7 +58,7 @@ export function TableView({ tableName, onNotFoundError }: Props) {
         <span className="self-stretch border-r border-muted"></span>
         <form onSubmit={onSearch} className="flex flex-1 items-center gap-2">
           <Input ref={inputRef} placeholder="Search" defaultValue={search} name="search" />
-          <SubmitButton variant={"outline"}>Search</SubmitButton>
+          <Button variant={"outline"}>Search</Button>
         </form>
       </div>
       <div className="rounded-md border">
@@ -86,7 +88,17 @@ export function TableView({ tableName, onNotFoundError }: Props) {
                   <Button size={"sm"} variant={"secondary"}>
                     Edit
                   </Button>
-                  <Button size={"sm"} variant={"destructive"}>
+                  <Button
+                    onClick={() =>
+                      setDeleteRowData({
+                        id: dbId,
+                        tableName,
+                        pkValue: `${row[pkIndex].objectValue}`,
+                      })
+                    }
+                    size={"sm"}
+                    variant={"destructive"}
+                  >
                     Delete
                   </Button>
                 </TableCell>
@@ -95,6 +107,11 @@ export function TableView({ tableName, onNotFoundError }: Props) {
           </TableBody>
         </Table>
       </div>
+      <DeleteRowDialog
+        isVisible={!!deleteRowData}
+        onVisibleChange={() => setDeleteRowData(null)}
+        deleteRowData={deleteRowData}
+      />
     </div>
   );
 }
