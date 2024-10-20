@@ -80,7 +80,14 @@ function DatabasePage() {
         {selectedColumn !== null ? (
           <ColumnView column={selectedColumn} />
         ) : selectedTable !== null ? (
-          <TableView tableName={selectedTable} onNotFoundError={onNotFoundError} />
+          <TableView
+            tableName={selectedTable}
+            onNotFoundError={onNotFoundError}
+            onDropTable={() => {
+              setSelectedColumn(null);
+              setSelectedTable(null);
+            }}
+          />
         ) : (
           <div></div>
         )}

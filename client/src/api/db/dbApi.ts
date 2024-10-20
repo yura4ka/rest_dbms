@@ -10,6 +10,7 @@ export const dbApi = {
   editRow: (id: string, tableName: string, pk: string, data: EditRowDto) =>
     apiClient.put(`db/${id}/${tableName}/${pk}`, data),
   createTable: (id: string, data: EditTableDto) => apiClient.post(`db/${id}`, data),
+  dropTable: (id: string, tableName: string) => apiClient.delete(`db/${id}/${tableName}`),
   deleteRow: (id: string, tableName: string, pkValue: string) =>
-    apiClient.delete(`db/${id}/${tableName}`, { params: { pkValue } }),
+    apiClient.delete(`db/${id}/${tableName}/${pkValue}`),
 };

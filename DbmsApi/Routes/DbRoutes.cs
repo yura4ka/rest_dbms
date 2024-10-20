@@ -14,7 +14,8 @@ namespace DbmsApi.Routes
       db.MapPost("/{id}/{tableName}", CreateRow);
       db.MapPut("/{id}/{tableName}/{pk}", UpdateRow);
       db.MapPost("/{id}", CreateTable);
-      db.MapDelete("/{id}/{tableName}", DeleteRow);
+      db.MapDelete("/{id}/{tableName}", DropTable);
+      db.MapDelete("/{id}/{tableName}/{pkValue}", DeleteRow);
     }
 
     private static IResult GetDatabaseInfo(string id, IConnectionManager connectionManager)
@@ -221,6 +222,18 @@ namespace DbmsApi.Routes
       if (table == null) return TypedResults.Json(new { }, statusCode: 404);
 
       table.DeleteRow(pkValue);
+      return TypedResults.NoContent();
+    }
+
+    private static IResult DropTable(string id, string tableName, IConnectionManager connectionManager)
+    {
+      var database = connectionManager.Connect(id);
+      if (database == null) return TypedResults.Json(new { }, statusCode: 404);
+
+      var table = database.Tables.Find(t => t.Name == tableName);
+      if (table == null) return TypedResults.Json(new { }, statusCode: 404);
+
+      database.DropTable(table);
       return TypedResults.NoContent();
     }
   }

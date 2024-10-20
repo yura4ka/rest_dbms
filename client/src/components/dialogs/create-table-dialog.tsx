@@ -96,7 +96,13 @@ export function CreateTableDialog({ id, children }: Props) {
 
   const addColumn = () => {
     const newColumns = [...data.columns];
-    newColumns.push({ name: "", typeName: types[0], isNotNull: false, defaultValue: "" });
+    newColumns.push({
+      name: "",
+      typeName: types[0],
+      isNotNull: false,
+      defaultValue: "",
+      key: window.performance.now(),
+    });
     setData((prev) => ({ ...prev, columns: newColumns }));
   };
 
@@ -154,7 +160,7 @@ export function CreateTableDialog({ id, children }: Props) {
                 <p className="text-sm text-destructive">{typedErrors["TableName"]}</p>
               </div>
               {data.columns.map((column, index) => (
-                <div className="grid gap-4 rounded-md border border-muted p-4">
+                <div key={column.key} className="grid gap-4 rounded-md border border-muted p-4">
                   <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label htmlFor={`$name_{index}`}>Column Name</Label>
                     <Input

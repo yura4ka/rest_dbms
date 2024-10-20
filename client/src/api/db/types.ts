@@ -34,6 +34,7 @@ export interface EditRowError {
 }
 
 export interface ColumnDefinitionDto {
+  key: number;
   name: string;
   typeName: string;
   isNotNull: boolean;

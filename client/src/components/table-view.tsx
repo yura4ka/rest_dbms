@@ -10,13 +10,15 @@ import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { DeleteRowData, DeleteRowDialog } from "./dialogs/delete-row-dialog";
 import { EditRowDialog } from "./dialogs/edit-row-dialog";
+import { DropTableDialog } from "./dialogs/drop-table-dialog";
 
 type Props = {
   tableName: string;
   onNotFoundError: () => void;
+  onDropTable?: () => void;
 };
 
-export function TableView({ tableName, onNotFoundError }: Props) {
+export function TableView({ tableName, onNotFoundError, onDropTable }: Props) {
   const navigate = useNavigate({ from: "/db/$dbId" });
   const dbId = useParams({ from: "/db/$dbId/", select: (p) => p.dbId });
   const search = useSearch({ from: "/db/$dbId/", select: (s) => s.search });
@@ -61,7 +63,9 @@ export function TableView({ tableName, onNotFoundError }: Props) {
           <Button onClick={() => setEditRowData({ isVisible: true, defaultValue: null, id: null })}>
             Add Row
           </Button>
-          <Button variant={"destructive"}>Drop Table</Button>
+          <DropTableDialog key={tableName} id={dbId} tableName={tableName} onDelete={onDropTable}>
+            <Button variant={"destructive"}>Drop Table</Button>
+          </DropTableDialog>
         </div>
         <span className="self-stretch border-r border-muted"></span>
         <form onSubmit={onSearch} className="flex flex-1 items-center gap-2">
