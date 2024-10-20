@@ -24,3 +24,11 @@ export interface DbValue {
   objectValue: unknown;
   isNull: boolean;
 }
+
+export interface EditRowDto {
+  values: Record<string, string>;
+}
+
+export interface EditRowError {
+  errors: Record<string, string>;
+}

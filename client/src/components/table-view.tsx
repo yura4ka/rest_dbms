@@ -9,6 +9,7 @@ import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
 import { DeleteRowData, DeleteRowDialog } from "./dialogs/delete-row-dialog";
+import { EditRowDialog } from "./dialogs/edit-row-dialog";
 
 type Props = {
   tableName: string;
@@ -26,6 +27,11 @@ export function TableView({ tableName, onNotFoundError }: Props) {
   });
 
   const [deleteRowData, setDeleteRowData] = useState<DeleteRowData | null>(null);
+  const [editRowData, setEditRowData] = useState(() => ({
+    isVisible: false,
+    id: null as string | null,
+    defaultValue: null as string[] | null,
+  }));
 
   const pkIndex = useMemo(() => getPkIndex(data?.columns ?? []), [data?.columns]);
 
@@ -52,7 +58,9 @@ export function TableView({ tableName, onNotFoundError }: Props) {
     <div>
       <div className="mb-4 flex items-center gap-4">
         <div className="flex gap-2">
-          <Button>Add Row</Button>
+          <Button onClick={() => setEditRowData({ isVisible: true, defaultValue: null, id: null })}>
+            Add Row
+          </Button>
           <Button variant={"destructive"}>Drop Table</Button>
         </div>
         <span className="self-stretch border-r border-muted"></span>
@@ -85,7 +93,17 @@ export function TableView({ tableName, onNotFoundError }: Props) {
                   </TableCell>
                 ))}
                 <TableCell className="flex justify-end gap-2 text-right">
-                  <Button size={"sm"} variant={"secondary"}>
+                  <Button
+                    onClick={() =>
+                      setEditRowData({
+                        id: row[pkIndex].stringValue,
+                        isVisible: true,
+                        defaultValue: row.map((c) => c.stringValue),
+                      })
+                    }
+                    size={"sm"}
+                    variant={"secondary"}
+                  >
                     Edit
                   </Button>
                   <Button
@@ -107,6 +125,15 @@ export function TableView({ tableName, onNotFoundError }: Props) {
           </TableBody>
         </Table>
       </div>
+      <EditRowDialog
+        key={editRowData.id}
+        id={dbId}
+        tableName={tableName}
+        isVisible={editRowData.isVisible}
+        onVisibleChange={() => setEditRowData((prev) => ({ ...prev, isVisible: false }))}
+        columns={data?.columns ?? []}
+        defaultValue={editRowData.defaultValue}
+      />
       <DeleteRowDialog
         isVisible={!!deleteRowData}
         onVisibleChange={() => setDeleteRowData(null)}
