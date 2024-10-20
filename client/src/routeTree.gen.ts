@@ -17,6 +17,7 @@ import { Route as rootRoute } from './routes/__root'
 // Create Virtual Routes
 
 const IndexLazyImport = createFileRoute('/')()
+const DbDbIdIndexLazyImport = createFileRoute('/db/$dbId/')()
 
 // Create/Update Routes
 
@@ -24,6 +25,13 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const DbDbIdIndexLazyRoute = DbDbIdIndexLazyImport.update({
+  path: '/db/$dbId/',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() =>
+  import('./routes/db_.$dbId.index.lazy').then((d) => d.Route),
+)
 
 // Populate the FileRoutesByPath interface
 
@@ -36,6 +44,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexLazyImport
       parentRoute: typeof rootRoute
     }
+    '/db/$dbId/': {
+      id: '/db/$dbId/'
+      path: '/db/$dbId'
+      fullPath: '/db/$dbId'
+      preLoaderRoute: typeof DbDbIdIndexLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -43,32 +58,37 @@ declare module '@tanstack/react-router' {
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexLazyRoute
+  '/db/$dbId': typeof DbDbIdIndexLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexLazyRoute
+  '/db/$dbId': typeof DbDbIdIndexLazyRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexLazyRoute
+  '/db/$dbId/': typeof DbDbIdIndexLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/db/$dbId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/db/$dbId'
+  id: '__root__' | '/' | '/db/$dbId/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexLazyRoute: typeof IndexLazyRoute
+  DbDbIdIndexLazyRoute: typeof DbDbIdIndexLazyRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexLazyRoute: IndexLazyRoute,
+  DbDbIdIndexLazyRoute: DbDbIdIndexLazyRoute,
 }
 
 export const routeTree = rootRoute
@@ -83,11 +103,15 @@ export const routeTree = rootRoute
     "__root__": {
       "filePath": "__root.tsx",
       "children": [
-        "/"
+        "/",
+        "/db/$dbId/"
       ]
     },
     "/": {
       "filePath": "index.lazy.tsx"
+    },
+    "/db/$dbId/": {
+      "filePath": "db_.$dbId.index.lazy.tsx"
     }
   }
 }

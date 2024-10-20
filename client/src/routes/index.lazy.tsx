@@ -20,7 +20,7 @@ export const Route = createLazyFileRoute("/")({
 });
 
 function Index() {
-  const { data: databases, isLoading } = useQuery({
+  const { data: databases, isPending } = useQuery({
     queryFn: () => api.root.getDatabases(),
     queryKey: queryKeyFactory.root.all,
   });
@@ -37,34 +37,34 @@ function Index() {
           <Button className="self-end">Create database</Button>
         </CreateDatabaseDialog>
       </div>
-      {isLoading ? (
-        <Loader2 className="animate-spin" />
+      {isPending ? (
+        <div className="grid place-content-center py-8">
+          <Loader2 className="animate-spin" />
+        </div>
       ) : (
-        <>
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-background">
-                <TableHead>Name</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow className="hover:bg-background">
+              <TableHead>Name</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {databases?.map((db) => (
+              <TableRow key={db.id} className="hover:bg-background">
+                <TableCell className="font-medium">{db.name}</TableCell>
+                <TableCell className="flex justify-end gap-2 text-right">
+                  <Button asChild size={"sm"}>
+                    <Link to={`/db/${db.id}`}>Connect</Link>
+                  </Button>
+                  <Button onClick={() => setDeleteId(db.id)} size={"sm"} variant={"destructive"}>
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {databases?.map((db) => (
-                <TableRow key={db.id} className="hover:bg-background">
-                  <TableCell className="font-medium">{db.name}</TableCell>
-                  <TableCell className="flex justify-end gap-2 text-right">
-                    <Button asChild size={"sm"}>
-                      <Link to={`/`}>Connect</Link>
-                    </Button>
-                    <Button onClick={() => setDeleteId(db.id)} size={"sm"} variant={"destructive"}>
-                      Delete
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </>
+            ))}
+          </TableBody>
+        </Table>
       )}
       <DeleteDatabaseDialog
         key={deleteId}

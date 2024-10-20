@@ -48,7 +48,7 @@ export function CreateDatabaseDialog({ children }: Props) {
     e.preventDefault();
     const { id } = await createDatabase.mutateAsync();
     changeIsOpen(false);
-    navigate({ to: "/" });
+    navigate({ to: `/db/${id}` });
   };
 
   const isDisabled = name.trim().length === 0;

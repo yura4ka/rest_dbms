@@ -19,5 +19,6 @@ var app = builder.Build();
 app.UseCors(MyAllowSpecificOrigins);
 
 app.RegisterHomeRoutes();
+app.RegisterDbRoutes();
 
 app.Run();
