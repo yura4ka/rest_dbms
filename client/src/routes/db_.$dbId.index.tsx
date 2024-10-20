@@ -4,11 +4,20 @@ import { ColumnView } from "@/components/column-view";
 import { DbTreeView } from "@/components/db-tree-view";
 import { TableView } from "@/components/table-view";
 import { useQuery } from "@tanstack/react-query";
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 
-export const Route = createLazyFileRoute("/db/$dbId/")({
+type DbSearch = {
+  search?: string;
+};
+
+export const Route = createFileRoute("/db/$dbId/")({
+  validateSearch: (search: Record<string, unknown>): DbSearch => {
+    return {
+      search: search.search as string,
+    };
+  },
   component: DatabasePage,
 });
 
@@ -16,7 +25,7 @@ function DatabasePage() {
   const { dbId } = Route.useParams();
   const navigate = useNavigate();
 
-  const { data, isPending, error } = useQuery({
+  const { data, isFetching, error } = useQuery({
     queryKey: queryKeyFactory.db.dbById(dbId),
     queryFn: () => api.db.getInfo(dbId),
   });
@@ -46,7 +55,7 @@ function DatabasePage() {
   return (
     <div className="container grid max-w-screen-2xl grid-cols-[1fr_4fr]">
       <nav className="h-full border-r py-8">
-        {isPending ? (
+        {isFetching ? (
           <div className="grid h-full place-content-center pb-16">
             <Loader2 className="animate-spin" />
           </div>

@@ -1,13 +1,14 @@
 import { api, queryKeyFactory } from "@/api";
 import { useQuery } from "@tanstack/react-query";
-import { useParams } from "@tanstack/react-router";
+import { useNavigate, useParams, useSearch } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
 import { Table, TableHeader, TableRow, TableBody, TableCell, TableHead } from "./ui/table";
 import { generateTableName, getPkIndex } from "@/lib/dbUtils";
-import { useMemo } from "react";
+import { useMemo, useRef } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { Input } from "./ui/input";
+import { SubmitButton } from "./submit-button";
 
 type Props = {
   tableName: string;
@@ -15,21 +16,29 @@ type Props = {
 };
 
 export function TableView({ tableName, onNotFoundError }: Props) {
+  const navigate = useNavigate({ from: "/db/$dbId" });
   const dbId = useParams({ from: "/db/$dbId/", select: (p) => p.dbId });
+  const search = useSearch({ from: "/db/$dbId/", select: (s) => s.search });
 
-  const { data, isPending, error } = useQuery({
-    queryKey: queryKeyFactory.db.tableById(dbId, tableName),
-    queryFn: () => api.db.getTable(dbId, tableName),
+  const { data, isFetching, error } = useQuery({
+    queryKey: queryKeyFactory.db.tableById(dbId, tableName, search),
+    queryFn: () => api.db.getTable(dbId, tableName, search),
   });
 
   const pkIndex = useMemo(() => getPkIndex(data?.columns ?? []), [data?.columns]);
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const onSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    navigate({ search: { search: inputRef.current?.value.trim() || undefined } });
+  };
 
   if (error?.status === 404) {
     onNotFoundError();
     return null;
   }
 
-  if (isPending) {
+  if (isFetching) {
     return (
       <div className="grid place-content-center pb-16">
         <Loader2 className="animate-spin" />
@@ -45,7 +54,10 @@ export function TableView({ tableName, onNotFoundError }: Props) {
           <Button variant={"destructive"}>Drop Table</Button>
         </div>
         <span className="self-stretch border-r border-muted"></span>
-        <Input placeholder="Search" name="search" />
+        <form onSubmit={onSearch} className="flex flex-1 items-center gap-2">
+          <Input ref={inputRef} placeholder="Search" defaultValue={search} name="search" />
+          <SubmitButton variant={"outline"}>Search</SubmitButton>
+        </form>
       </div>
       <div className="rounded-md border">
         <Table>
