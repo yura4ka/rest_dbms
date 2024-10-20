@@ -2,7 +2,9 @@ import { api, queryKeyFactory } from "@/api";
 import { DbColumn } from "@/api/db/types";
 import { ColumnView } from "@/components/column-view";
 import { DbTreeView } from "@/components/db-tree-view";
+import { CreateTableDialog } from "@/components/dialogs/create-table-dialog";
 import { TableView } from "@/components/table-view";
+import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Loader2 } from "lucide-react";
@@ -55,6 +57,11 @@ function DatabasePage() {
   return (
     <div className="container grid max-w-screen-2xl grid-cols-[1fr_4fr]">
       <nav className="h-full border-r py-8">
+        <div className="mx-auto mb-4 px-4">
+          <CreateTableDialog id={dbId}>
+            <Button className="w-full">Create Table</Button>
+          </CreateTableDialog>
+        </div>
         {isFetching ? (
           <div className="grid h-full place-content-center pb-16">
             <Loader2 className="animate-spin" />

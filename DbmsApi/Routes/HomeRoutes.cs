@@ -1,4 +1,5 @@
 using DbmsApi.DTO;
+using DbmsApi.Models;
 using DbmsApi.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -11,6 +12,7 @@ namespace DbmsApi.Routes
       app.MapGet("/", GetDatabases);
       app.MapPost("/", CreateDatabase);
       app.MapDelete("/{id}", DeleteDatabase);
+      app.MapGet("/types", GetTypes);
     }
 
     private static JsonHttpResult<List<DbDto>> GetDatabases(IConnectionManager connectionManager)
@@ -47,6 +49,11 @@ namespace DbmsApi.Routes
       connectionManager.DeleteConnection(id);
       File.Delete(fullPath);
       return TypedResults.NoContent();
+    }
+
+    private static IResult GetTypes()
+    {
+      return TypedResults.Json(TypeManager.AvailableTypes);
     }
   }
 }

@@ -57,3 +57,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .scrollbar::-webkit-scrollbar {
+    @apply h-1 w-1 rounded bg-transparent;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-sm bg-muted outline-none;
+  }
+}

@@ -6,4 +6,5 @@ export const rootApi = {
   createDatabase: (request: CreateDatabaseDto) =>
     apiClient.post<CreateDatabaseError, CreateDatabaseResponse>("/", request),
   deleteDatabase: (id: string) => apiClient.delete(`/${id}`),
+  getTypes: () => apiClient.get<string[]>("/types").then((res) => res.data),
 };

@@ -13,6 +13,7 @@ namespace DbmsApi.Routes
       db.MapGet("/{id}/{tableName}", GetTable);
       db.MapPost("/{id}/{tableName}", CreateRow);
       db.MapPut("/{id}/{tableName}/{pk}", UpdateRow);
+      db.MapPost("/{id}", CreateTable);
       db.MapDelete("/{id}/{tableName}", DeleteRow);
     }
 
@@ -126,6 +127,89 @@ namespace DbmsApi.Routes
 
       if (errors.Count != 0) return TypedResults.Json(new { Errors = errors }, statusCode: 400);
       return TypedResults.Json(new { }, statusCode: 200);
+    }
+
+    private static IResult CreateTable(string id, EditTableDto editTable, IConnectionManager connectionManager)
+    {
+      var database = connectionManager.Connect(id);
+      if (database == null) return TypedResults.Json(new { }, statusCode: 404);
+
+      var pkColumn = editTable.Columns[editTable.PrimaryKey];
+
+      int newPkIndex = editTable.Columns.IndexOf(pkColumn);
+      editTable.PrimaryKey = newPkIndex;
+      editTable.Columns = [.. editTable.Columns];
+
+      var table = new Table(database.TableController, editTable.TableName ?? "");
+      var errors = new Dictionary<string, string>();
+
+      for (int i = 0; i < editTable.Columns.Count; i++)
+      {
+        var c = editTable.Columns[i];
+
+        if (string.IsNullOrWhiteSpace(c.TypeName))
+          errors.Add($"Columns[{i}].TypeName", "Invalid value");
+        else if (!TypeManager.TypeMappings.ContainsKey(c.TypeName.ToUpper()))
+          errors.Add($"Columns[{i}].TypeName", "Type doesn't exists");
+
+        if (errors.Count != 0) continue;
+
+        if (string.IsNullOrWhiteSpace(c.Name))
+          errors.Add($"Columns[{i}].Name", "Invalid value");
+
+        var typeObject = TypeManager.TypeMappings[c.TypeName!.ToUpper()]();
+        var defaultValueObject = typeObject.Instance(null, false);
+        bool isValid = defaultValueObject.ParseString(c.DefaultValue ?? "");
+
+        if (!isValid && !string.IsNullOrEmpty(c.DefaultValue))
+          errors.Add($"Columns[{i}].DefaultValue", "Invalid value for the selected type");
+
+        for (int j = 0; j < editTable.Columns.Count; j++)
+        {
+          if (i == j) continue;
+          if
+          (
+            !string.IsNullOrWhiteSpace(c.Name)
+            && !string.IsNullOrWhiteSpace(editTable.Columns[j].Name)
+            && c.Name == editTable.Columns[j].Name
+          )
+            errors.Add($"Columns[{i}].Name", "Column name must be unique");
+        }
+
+        if (string.IsNullOrWhiteSpace(editTable.TableName))
+          errors.Add("TableName", "Invalid value");
+
+        if (database.Tables.Exists(t => t.Name == editTable.TableName?.Trim()))
+          errors.Add("TableName", "Table with this name already exists");
+
+        if (errors.Count != 0) continue;
+
+        var column = new Column(c.Name!.Trim(),
+              typeObject,
+              c.IsNotNull,
+              defaultValueObject.ObjectValue,
+              editTable.PrimaryKey == i);
+        table.AddColumn(column);
+      }
+
+      editTable.PrimaryKey = editTable.PrimaryKey == -1 ? 0 : editTable.PrimaryKey;
+
+      if (errors.Count != 0)
+        return TypedResults.Json(new { Errors = errors }, statusCode: 400);
+
+      try
+      {
+        bool isValid = database.CreateTable(table);
+        if (!isValid) errors.Add("", "Error!");
+      }
+      catch (Exception ex)
+      {
+        errors.Add("", ex.Message);
+      }
+
+      if (errors.Count != 0)
+        return TypedResults.Json(new { Errors = errors }, statusCode: 400);
+      return TypedResults.Json(new { }, statusCode: 201);
     }
 
     private static IResult DeleteRow(string id, string tableName, string pkValue, IConnectionManager connectionManager)

@@ -32,3 +32,16 @@ export interface EditRowDto {
 export interface EditRowError {
   errors: Record<string, string>;
 }
+
+export interface ColumnDefinitionDto {
+  name: string;
+  typeName: string;
+  isNotNull: boolean;
+  defaultValue: string;
+}
+
+export interface EditTableDto {
+  tableName: string;
+  columns: ColumnDefinitionDto[];
+  primaryKey: number;
+}
