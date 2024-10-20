@@ -34,8 +34,12 @@ function DatabasePage() {
     setSelectedColumn(column);
   };
 
-  if (error?.status === 404) {
+  const onNotFoundError = () => {
     navigate({ to: "/" });
+  };
+
+  if (error?.status === 404) {
+    onNotFoundError();
     return null;
   }
 
@@ -56,11 +60,11 @@ function DatabasePage() {
           />
         )}
       </nav>
-      <div className="py-8 pl-8">
+      <div className="grid py-8 pl-8">
         {selectedColumn !== null ? (
           <ColumnView column={selectedColumn} />
         ) : selectedTable !== null ? (
-          <TableView tableName={selectedTable} />
+          <TableView tableName={selectedTable} onNotFoundError={onNotFoundError} />
         ) : (
           <div></div>
         )}

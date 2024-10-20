@@ -7,6 +7,7 @@ export interface DbInfoDto {
 export interface DbTable {
   name: string;
   columns: DbColumn[];
+  rows: DbValue[][];
 }
 
 export interface DbColumn {
@@ -15,4 +16,11 @@ export interface DbColumn {
   isNotNull: boolean;
   defaultValue: string | null;
   isPk: boolean;
+}
+
+export interface DbValue {
+  isNullable: boolean;
+  stringValue: string;
+  objectValue: unknown;
+  isNull: boolean;
 }
